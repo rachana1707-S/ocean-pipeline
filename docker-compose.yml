@@ -1,0 +1,49 @@
+services:
+
+  # ── 1. PostgreSQL Database ──────────────────────────────────────
+  postgres:
+    image: postgres:15
+    container_name: ocean_postgres
+    env_file: .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data      # persist DB data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql  # auto-run on first start
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ocean_user -d ocean_db"]
+      interval: 10s
+      retries: 5
+
+  # ── 2. Pipeline (Ingestion + Transformation + Scheduler) ────────
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile.pipeline
+    container_name: ocean_pipeline
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app                                       # live reload during dev
+    command: python ingestion/scheduler.py
+
+  # ── 3. Streamlit Dashboard ──────────────────────────────────────
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: ocean_dashboard
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8501:8501"                                  # open localhost:8501 in browser
+    volumes:
+      - .:/app
+    command: streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0
+
+volumes:
+  postgres_data:
