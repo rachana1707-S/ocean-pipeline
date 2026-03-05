@@ -25,7 +25,7 @@ def write_sensor_readings(df: pd.DataFrame):
                      :wind_speed_ms, :water_level_m, :air_pressure_mb)
                 ON CONFLICT (station_id, timestamp) DO NOTHING
             """), row.to_dict())
-    print(f"  ✅ Wrote {len(df)} rows to sensor_readings")
+    print(f"Wrote {len(df)} rows to sensor_readings")
 
 def log_quality(station_id, total, nulls, outliers, score):
     engine = get_engine()

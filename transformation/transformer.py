@@ -49,10 +49,10 @@ def rename_for_db(df):
     return df.rename(columns=rename_map)
 
 def transform(df):
-    print(f"  ⚙️  Transforming {len(df)} rows...")
+    print(f" Transforming {len(df)} rows...")
     df = rename_for_db(df)
     df = add_time_features(df)
     df = add_heat_index(df)
     df = add_wind_category(df)
-    print(f"  ✅ Transformation done")
+    print(f"Transformation done")
     return df

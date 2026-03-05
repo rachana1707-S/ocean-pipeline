@@ -50,5 +50,5 @@ def clean(df):
     df, outlier_count = remove_outliers(df)
     df = remove_duplicates(df)
     df = fill_missing(df)
-    print(f"  ✅ Cleaning done — {outlier_count} outliers replaced")
+    print(f"  Cleaning done — {outlier_count} outliers replaced")
     return df, outlier_count

@@ -10,14 +10,14 @@ def check_nulls(df):
             pct = df[col].isna().mean()
             result[col] = round(pct, 4)
             if pct > NULL_THRESHOLD:
-                print(f"  ⚠️  High nulls in '{col}': {pct:.0%}")
+                print(f" High nulls in '{col}': {pct:.0%}")
     return result
 
 def check_row_count(df, min_rows=10):
     ok = True
     for sid, group in df.groupby("station_id"):
         if len(group) < min_rows:
-            print(f"  ⚠️  Station {sid} only has {len(group)} rows")
+            print(f" Station {sid} only has {len(group)} rows")
             ok = False
     return ok
 
@@ -28,7 +28,7 @@ def check_time_gaps(df, max_gap_minutes=60):
         gaps = group["timestamp"].diff().dt.total_seconds() / 60
         gap_count += (gaps > max_gap_minutes).sum()
     if gap_count:
-        print(f"  ⚠️  {gap_count} time gaps larger than {max_gap_minutes} mins")
+        print(f"  {gap_count} time gaps larger than {max_gap_minutes} mins")
     return gap_count
 
 def compute_quality_score(df, outlier_count):
@@ -43,11 +43,11 @@ def compute_quality_score(df, outlier_count):
     gap_count       = check_time_gaps(df)
     gap_penalty     = min(gap_count * 2, 30)
     score = round(max(100 - null_penalty - outlier_penalty - gap_penalty, 0), 2)
-    print(f"  📊 Quality score: {score}/100")
+    print(f" Quality score: {score}/100")
     return score
 
 def validate(df, outlier_count):
-    print(f"  🔍 Validating {len(df)} rows...")
+    print(f"  Validating {len(df)} rows...")
     check_nulls(df)
     check_row_count(df)
     score = compute_quality_score(df, outlier_count)

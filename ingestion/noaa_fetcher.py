@@ -44,7 +44,7 @@ def fetch_product(station_id: str, product: str, start: str, end: str) -> pd.Dat
     data = resp.json()
 
     if "error" in data:
-        print(f"    ⚠️  {station_id} / {product}: {data['error'].get('message', 'unknown error')}")
+        print(f" {station_id} / {product}: {data['error'].get('message', 'unknown error')}")
         return pd.DataFrame()
 
     rows = data.get("data", [])
@@ -61,7 +61,7 @@ def fetch_product(station_id: str, product: str, start: str, end: str) -> pd.Dat
     elif "s" in df.columns:
         val_col = "s"   # wind speed
     else:
-        print(f"    ⚠️  Unexpected columns from NOAA: {list(df.columns)}")
+        print(f"Unexpected columns from NOAA: {list(df.columns)}")
         return pd.DataFrame()
 
     df["t"] = pd.to_datetime(df["t"])
@@ -76,7 +76,7 @@ def fetch_station(station_id: str, days_back: int = 30) -> pd.DataFrame:
     s_str = start.strftime("%Y%m%d")
     e_str = end.strftime("%Y%m%d")
 
-    print(f"  📡 Fetching station {station_id} ({STATIONS[station_id]})...")
+    print(f"Fetching station {station_id} ({STATIONS[station_id]})...")
 
     frames = []
     for col, product in PRODUCTS.items():
@@ -86,7 +86,7 @@ def fetch_station(station_id: str, days_back: int = 30) -> pd.DataFrame:
             frames.append(df.set_index("timestamp"))
 
     if not frames:
-        print(f"    ❌ No data returned for {station_id}")
+        print(f"No data returned for {station_id}")
         return pd.DataFrame()
 
     # Merge all products on timestamp
@@ -111,7 +111,7 @@ def fetch_all_stations(days_back: int = 30) -> pd.DataFrame:
         return pd.DataFrame()
 
     combined = pd.concat(all_frames, ignore_index=True)
-    print(f"\n  📦 Total raw rows fetched: {len(combined)}")
+    print(f"\n Total raw rows fetched: {len(combined)}")
     return combined
 
 
