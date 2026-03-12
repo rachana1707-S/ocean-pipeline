@@ -6,10 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_engine():
-    url = (
-        f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
-        f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
-    )
+    url = os.getenv("DATABASE_URL")
+    if not url:
+        url = (
+            f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
+            f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+        )
     return create_engine(url)
 
 def write_sensor_readings(df: pd.DataFrame):
@@ -25,7 +27,7 @@ def write_sensor_readings(df: pd.DataFrame):
                      :wind_speed_ms, :water_level_m, :air_pressure_mb)
                 ON CONFLICT (station_id, timestamp) DO NOTHING
             """), row.to_dict())
-    print(f"Wrote {len(df)} rows to sensor_readings")
+    print(f"  ✅ Wrote {len(df)} rows to sensor_readings")
 
 def log_quality(station_id, total, nulls, outliers, score):
     engine = get_engine()
