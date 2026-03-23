@@ -6,12 +6,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_engine():
-    url = os.getenv("DATABASE_URL")
-    if not url:
-        url = (
-            f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
-            f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
-        )
+    # Try Streamlit secrets first (cloud deployment)
+    try:
+        import streamlit as st
+        url = st.secrets["DATABASE_URL"]
+    except Exception:
+        # Fall back to environment variables (local development)
+        url = os.getenv("DATABASE_URL")
+        if not url:
+            url = (
+                f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
+                f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+            )
     return create_engine(url)
 
 def write_sensor_readings(df: pd.DataFrame):
